@@ -14,22 +14,30 @@ jobs:
         uses: appleboy/ssh-action@v1.2.2
         env:
           APP_ENV_PRODUCTION: ${{ secrets.APP_ENV_PRODUCTION }}
+          REPO_NAME: ${{ github.event.repository.name }}
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           command_timeout: 35m
-          envs: APP_ENV_PRODUCTION
+          envs: APP_ENV_PRODUCTION,REPO_NAME
           script: |
             set -euo pipefail
-            cd ${{ secrets.VPS_APP_DIR }}
+            APP_ROOT="/opt/automation-sites"
+            APP_DIR="$APP_ROOT/$REPO_NAME"
+
+            mkdir -p "$APP_ROOT"
+            if [ ! -d "$APP_DIR/.git" ]; then
+              git clone "https://github.com/mr-devloper005/$REPO_NAME.git" "$APP_DIR"
+            fi
+
+            cd "$APP_DIR"
 
             printf '%s' "$APP_ENV_PRODUCTION" > .env
             chmod 600 .env
 
-            repo_name="$(basename "$PWD")"
-            git remote set-url origin "https://github.com/mr-devloper005/$repo_name.git" 2>/dev/null || true
+            git remote set-url origin "https://github.com/mr-devloper005/$REPO_NAME.git" 2>/dev/null || true
             git fetch origin main
             git checkout main
             git reset --hard origin/main
