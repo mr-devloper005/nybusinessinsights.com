@@ -1,0 +1,62 @@
+automation-sites-template/
+  .github/
+    workflows/
+      deploy.yml
+
+  deploy/
+    nginx/
+      site.conf
+    scripts/
+      deploy.sh
+
+  public/
+
+  src/
+    app/
+      (public routes)
+      api/
+      sitemap.ts
+      robots.ts
+      layout.tsx
+      page.tsx
+
+    components/
+      core/
+      cards/
+      layout/
+      task/
+      seo/
+      theme/
+
+    lib/
+      api/
+      seo/
+      sitemap/
+      search/
+      comments/
+      connector/
+      utils/
+
+    config/
+      site.config.ts
+      theme.config.ts
+      seo.config.ts
+      tasks.config.ts
+      navigation.config.ts
+
+    data/
+      fallback/
+      mocks/
+
+    hooks/
+
+    types/
+
+  Dockerfile
+  docker-compose.vps.yml
+  package.json
+  pnpm-lock.yaml
+  next.config.mjs
+  tsconfig.json
+  .env.example
+  README.md

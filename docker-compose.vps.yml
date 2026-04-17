@@ -1,0 +1,28 @@
+services:
+  wmq7ycvi8r:
+    container_name: wmq7ycvi8r_app
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_MASTER_PANEL_URL: ${NEXT_PUBLIC_MASTER_PANEL_URL}
+        NEXT_PUBLIC_MASTER_API_URL: ${NEXT_PUBLIC_MASTER_API_URL}
+        NEXT_PUBLIC_SITE_CODE: ${NEXT_PUBLIC_SITE_CODE}
+        NEXT_PUBLIC_FEED_REVALIDATE_SECONDS: ${NEXT_PUBLIC_FEED_REVALIDATE_SECONDS}
+        NEXT_PUBLIC_SITE_NAME: ${NEXT_PUBLIC_SITE_NAME}
+        NEXT_PUBLIC_SITE_TAGLINE: ${NEXT_PUBLIC_SITE_TAGLINE}
+        NEXT_PUBLIC_SITE_DESCRIPTION: ${NEXT_PUBLIC_SITE_DESCRIPTION}
+        NEXT_PUBLIC_SITE_DOMAIN: ${NEXT_PUBLIC_SITE_DOMAIN}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_SITE_OG_IMAGE: ${NEXT_PUBLIC_SITE_OG_IMAGE}
+    env_file:
+      - .env
+    network_mode: bridge
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3137:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 5

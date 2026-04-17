@@ -1,0 +1,369 @@
+1. LinkRiseUp Audit As Template Candidate
+
+LinkRiseUp ab ek normal site nahi, ek base product candidate hai.
+Isko template banane ke liye hume code ko 3 buckets me dekhna hoga:
+
+A. Core reusable logic
+Ye har site me same rehna chahiye:
+
+master panel connector
+feed fetching
+task rendering system
+post detail pages
+search framework
+sitemap/robots
+metadata framework
+schema helpers
+indexing hooks
+comments system
+pagination
+reusable cards
+deploy/docker/nginx/github-actions setup
+B. Site-config driven parts
+Ye per site change hona chahiye:
+
+site name
+domain
+site code
+logo
+contact info
+social links
+enabled tasks
+default categories
+SEO defaults
+homepage section copy
+header/footer labels
+C. Theme/UI driven parts
+Ye visually change honi chahiye:
+
+colors
+typography
+spacing
+hero layout
+card style
+icon style
+section shapes/backgrounds
+homepage composition
+Audit result
+LinkRiseUp template candidate tab banega jab:
+
+hardcoded site references remove ho
+config-first naming ho
+common logic isolated ho
+theme layer alag ho
+panel integration stable ho
+So yes: LinkRiseUp is a strong base, but abhi ise template-grade cleanup chahiye.
+
+2. automation-sites-template Structure Define
+
+Recommended structure:
+
+automation-sites-template/
+  .github/
+    workflows/
+      deploy.yml
+
+  deploy/
+    nginx/
+      site.conf
+    scripts/
+      deploy.sh
+
+  public/
+
+  src/
+    app/
+      (public routes)
+      api/
+      sitemap.ts
+      robots.ts
+      layout.tsx
+      page.tsx
+
+    components/
+      core/
+      cards/
+      layout/
+      task/
+      seo/
+      theme/
+
+    lib/
+      api/
+      seo/
+      sitemap/
+      search/
+      comments/
+      connector/
+      utils/
+
+    config/
+      site.config.ts
+      theme.config.ts
+      seo.config.ts
+      tasks.config.ts
+      navigation.config.ts
+
+    data/
+      fallback/
+      mocks/
+
+    hooks/
+
+    types/
+
+  Dockerfile
+  docker-compose.vps.yml
+  package.json
+  pnpm-lock.yaml
+  next.config.mjs
+  tsconfig.json
+  .env.example
+  README.md
+Why this works
+config/ = site-specific behavior
+components/ = reusable UI system
+lib/connector/ = master panel integration
+lib/seo/ = reusable SEO engine
+deploy/ = same deploy process for every site
+3. Config Boundaries Define
+
+Ye sabse important part hai.
+Har cheez ka owner clear hona chahiye.
+
+.env me kya jayega
+Only environment/runtime values:
+
+NEXT_PUBLIC_SITE_NAME=Link Rise Up
+NEXT_PUBLIC_SITE_URL=https://linkriseup.com
+NEXT_PUBLIC_SITE_CODE=linkriseup
+NEXT_PUBLIC_MASTER_API_URL=https://master-site-panel.onrender.com
+NEXT_PUBLIC_DEFAULT_THEME=urban-directory
+site.config.ts me kya jayega
+Brand/site identity:
+
+export const siteConfig = {
+  siteName: 'Link Rise Up',
+  siteCode: 'linkriseup',
+  domain: 'linkriseup.com',
+  logo: '/logo.svg',
+  description: '...',
+  contactEmail: '...',
+  socialLinks: {...},
+}
+theme.config.ts me kya jayega
+Visual system:
+
+export const themeConfig = {
+  themeKey: 'urban-directory',
+  fonts: {...},
+  colors: {...},
+  radius: {...},
+  heroVariant: 'split-banner',
+  cardVariant: 'elevated-grid',
+}
+seo.config.ts me kya jayega
+Default SEO rules:
+
+export const seoConfig = {
+  defaultTitle: '...',
+  titleTemplate: '%s | Link Rise Up',
+  defaultDescription: '...',
+  defaultOgImage: '...',
+  robots: 'index,follow',
+}
+tasks.config.ts me kya jayega
+Task availability:
+
+export const tasksConfig = {
+  enabledTasks: ['listing', 'article', 'classified', 'image', 'pdf', 'comment'],
+  routeMap: {...},
+}
+Master panel me kya rahega
+Dynamic operational data:
+
+site status
+indexing
+sitemap status
+seo audit
+publishing
+task enablement flags
+page overrides
+health checks
+4. New-Site SOP Write
+
+Ye tumhara repeatable process hoga.
+
+SOP: Create New Site
+Step 1. Create new repo from template
+GitHub par Use this template
+repo name example: citybiznow.com
+Step 2. Update env
+NEXT_PUBLIC_SITE_NAME
+NEXT_PUBLIC_SITE_URL
+NEXT_PUBLIC_SITE_CODE
+NEXT_PUBLIC_MASTER_API_URL
+Step 3. Update config
+src/config/site.config.ts
+src/config/theme.config.ts
+src/config/seo.config.ts
+src/config/tasks.config.ts
+Step 4. Replace branding
+logo
+favicon
+OG image
+social/contact links
+Step 5. Create site in master panel
+site code
+frontend URL
+supported tasks
+category
+connector version
+Step 6. Setup deploy
+VPS folder
+domain DNS
+nginx
+SSL
+GitHub Actions secrets
+Step 7. Verify production
+home page
+task pages
+feed loading
+sitemap
+robots
+canonicals
+search
+comments
+panel connection
+Step 8. SEO verification
+metadata
+schema
+sitemap urls
+indexing status
+image alts
+internal links
+Step 9. Publish first test content
+listing
+article
+pdf
+comment
+Step 10. Final QA
+mobile
+page speed
+search
+live URLs
+sitemap indexing
+5. Master Panel Role Define Clearly
+
+Ye part bahut important hai.
+Panel ko over-control nahi dena.
+
+Master Panel should control
+site registry
+site status
+API keys
+task enablement
+publishing flow
+feed monitoring
+indexing monitoring
+sitemap live status
+SEO audit
+page-level SEO overrides
+domain/runtime status
+content performance analytics
+Master Panel should NOT control
+raw page layout
+component-level styling
+hero design
+card animation design
+page-specific visual composition
+Why:
+
+UI freedom chahiye
+every site visually different ho sakti hai
+panel ko operations center rehna hai, page builder nahi
+Best definition
+Master Site Panel = operations + publishing + SEO + indexing + monitoring control center
+
+Not:
+Master Site Panel = full visual website builder
+
+6. Site Creation Checklist Automate
+
+Tumhara goal 100+ sites hai, so manual checklist ko automation-friendly banana hoga.
+
+A. Template bootstrap checklist
+Har new repo me ek file:
+SITE_SETUP_CHECKLIST.md
+
+Example:
+
+- [ ] Update .env
+- [ ] Update site.config.ts
+- [ ] Update theme.config.ts
+- [ ] Update seo.config.ts
+- [ ] Replace logo/favicon/og image
+- [ ] Create site in master panel
+- [ ] Add DNS records
+- [ ] Add GitHub Actions secrets
+- [ ] Deploy to VPS
+- [ ] Verify sitemap
+- [ ] Verify canonical
+- [ ] Verify first publish
+- [ ] Verify indexing panel
+B. Scriptable automation later
+Future me tum ye automate kar sakte ho:
+
+scaffold new repo
+rename brand values
+generate default config
+create env file template
+create nginx block
+create VPS folder
+create site entry in master panel
+C. What to automate first
+Best order:
+
+site config generation
+env generation
+deploy secret checklist
+panel site creation helper
+nginx block generation
+QA health report
+Recommended Operating Model
+
+Agar mujhe tumhare liye one-line strategy bolni ho, to woh ye hogi:
+
+One template, many branded instances, one central panel for operations.
+
+That is the scalable model.
+
+Practical Recommendation For You Right Now
+
+Ab tumhe 3 phases me kaam karna chahiye:
+
+Phase 1: Template cleanup
+Goal:
+
+LinkRiseUp se hardcoded values hatao
+config boundaries enforce karo
+Phase 2: Template extraction
+Goal:
+
+automation-sites-template repo banao
+deploy + config + seo + connector standardize karo
+Phase 3: Panel standardization
+Goal:
+
+panel me site creation + SEO + indexing + health ko centralize karo
+What I would do next
+Best next implementation order:
+
+LinkRiseUp me hardcoded values audit
+config/ folder standardization
+automation-sites-template repo prep
+SITE_SETUP_CHECKLIST.md
+NEW_SITE_SOP.md
+panel role document
+
+
