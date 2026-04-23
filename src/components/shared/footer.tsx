@@ -26,7 +26,6 @@ const footerLinks = {
     icon: taskIcons[task.key] || LayoutGrid,
   })),
   company: [
-    { name: 'About', href: '/about' },
     { name: 'Team', href: '/team' },
     { name: 'Careers', href: '/careers' },
     { name: 'Blog', href: '/blog' },
@@ -88,8 +87,8 @@ export function Footer() {
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr_1fr]">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-7">
               <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-white/8 p-1.5">
-                  <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="48" height="48" className="h-full w-full object-contain" />
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border border-white/12 bg-white/8 text-sm font-black uppercase tracking-tight text-white">
+                  {SITE_CONFIG.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
                   <p className="text-lg font-semibold">{SITE_CONFIG.name}</p>
@@ -180,8 +179,8 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr_0.8fr_0.8fr_0.8fr]">
           <div>
             <Link href="/" className="flex items-center gap-3">
-              <div className="h-11 w-11 overflow-hidden rounded-2xl border border-slate-200 bg-white p-1 shadow-sm">
-                <img src="/favicon.png?v=20260401" alt={`${SITE_CONFIG.name} logo`} width="44" height="44" className="h-full w-full object-contain" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-slate-200 bg-slate-100 text-xs font-black uppercase tracking-tight text-slate-800 shadow-sm">
+                {SITE_CONFIG.name.slice(0, 2).toUpperCase()}
               </div>
               <div>
                 <span className="block text-lg font-semibold">{SITE_CONFIG.name}</span>

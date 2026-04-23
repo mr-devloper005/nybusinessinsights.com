@@ -33,7 +33,7 @@ export async function HomePageOverride() {
               </div>
               <p className="mx-auto mt-10 max-w-3xl text-lg leading-9 text-neutral-700">{excerpt(featured.summary)}</p>
               <div className="mt-8 text-center">
-                <Link href={`/updates/${featured.slug}`} className="inline-flex rounded-full bg-neutral-800 px-8 py-3 text-sm font-medium text-white hover:bg-black">Continue Reading</Link>
+                <Link href={`/archive/${featured.slug}`} className="inline-flex rounded-full bg-neutral-800 px-8 py-3 text-sm font-medium text-white hover:bg-black">Continue Reading</Link>
               </div>
             </article>
           ) : null}
@@ -49,7 +49,7 @@ export async function HomePageOverride() {
                 </div>
                 <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-neutral-700">{excerpt(post.summary)}</p>
                 <div className="mt-8 text-center">
-                  <Link href={`/updates/${post.slug}`} className="inline-flex rounded-full bg-neutral-800 px-8 py-3 text-sm font-medium text-white hover:bg-black">Continue Reading</Link>
+                  <Link href={`/archive/${post.slug}`} className="inline-flex rounded-full bg-neutral-800 px-8 py-3 text-sm font-medium text-white hover:bg-black">Continue Reading</Link>
                 </div>
               </article>
             ))}
@@ -66,7 +66,7 @@ export async function HomePageOverride() {
           <div className="border border-neutral-200 p-6">
             <div className="space-y-5">
               {recent.map((post) => (
-                <Link key={post.id} href={`/updates/${post.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
+                <Link key={post.id} href={`/archive/${post.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
                   <p className="text-base leading-7 text-neutral-700">{post.title}</p>
                 </Link>
               ))}

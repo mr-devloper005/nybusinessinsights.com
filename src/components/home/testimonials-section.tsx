@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { Star, Quote } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Card, CardContent } from '@/components/ui/card'
 import { mockTestimonials } from '@/data/mock-data'
 
@@ -37,7 +37,6 @@ export function TestimonialsSection() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Avatar>
-                        <AvatarImage src={testimonial.author.avatar} alt={testimonial.author.name} />
                         <AvatarFallback>{testimonial.author.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>

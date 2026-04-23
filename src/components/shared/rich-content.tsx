@@ -14,6 +14,8 @@ const sanitizeRichHtml = (html: string) =>
     .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
     .replace(/<iframe[^>]*>[\s\S]*?<\/iframe>/gi, "")
     .replace(/<object[^>]*>[\s\S]*?<\/object>/gi, "")
+    .replace(/<img[^>]*>/gi, "")
+    .replace(/<picture[^>]*>[\s\S]*?<\/picture>/gi, "")
     .replace(/\son[a-z]+\s*=\s*(['"]).*?\1/gi, "")
     .replace(/\shref\s*=\s*(['"])javascript:.*?\1/gi, ' href="#"');
 

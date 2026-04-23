@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { ArrowRight, Bookmark, Building2, Compass, FileText, Globe2, Image as ImageIcon, LayoutGrid, MapPin, ShieldCheck, Tag, User } from 'lucide-react'
-import { ContentImage } from '@/components/shared/content-image'
+import { ArrowRight, Bookmark, Building2, ChevronDown, Clock, Compass, FileText, Globe2, Image as ImageIcon, LayoutGrid, MapPin, ShieldCheck, Tag, User } from 'lucide-react'
 import { NavbarShell } from '@/components/shared/navbar-shell'
 import { Footer } from '@/components/shared/footer'
 import { SchemaJsonLd } from '@/components/seo/schema-jsonld'
@@ -15,6 +14,7 @@ import { getProductKind, type ProductKind } from '@/design/factory/get-product-k
 import type { SitePost } from '@/lib/site-connector'
 import { getHomeEditorialMockPosts, mergeEditorialPostsForHome } from '@/lib/home-editorial-mock'
 import { HOME_PAGE_OVERRIDE_ENABLED, HomePageOverride } from '@/overrides/home-page'
+import { cn } from '@/lib/utils'
 
 export const revalidate = 300
 
@@ -61,18 +61,6 @@ function getTaskHref(task: TaskKey, slug: string) {
   return `${route}/${slug}`
 }
 
-function getPostImage(post?: SitePost | null) {
-  const media = Array.isArray(post?.media) ? post?.media : []
-  const mediaUrl = media.find((item) => typeof item?.url === 'string' && item.url)?.url
-  const contentImage = typeof post?.content === 'object' && post?.content && Array.isArray((post.content as any).images)
-    ? (post.content as any).images.find((url: unknown) => typeof url === 'string' && url)
-    : null
-  const logo = typeof post?.content === 'object' && post?.content && typeof (post.content as any).logo === 'string'
-    ? (post.content as any).logo
-    : null
-  return mediaUrl || contentImage || logo || '/placeholder.svg?height=900&width=1400'
-}
-
 function getPostMeta(post?: SitePost | null) {
   if (!post || typeof post.content !== 'object' || !post.content) return { location: '', category: '' }
   const content = post.content as Record<string, unknown>
@@ -106,19 +94,6 @@ function getDirectoryTone(brandPack: string) {
     badge: 'bg-slate-950 text-white',
     action: 'bg-slate-950 text-white hover:bg-slate-800',
     actionAlt: 'border border-slate-200 bg-white text-slate-950 hover:bg-slate-100',
-  }
-}
-
-function getEditorialTone() {
-  return {
-    shell: 'bg-[#fbf6ee] text-[#241711]',
-    panel: 'border border-[#dcc8b7] bg-[#fffdfa] shadow-[0_24px_60px_rgba(77,47,27,0.08)]',
-    soft: 'border border-[#e6d6c8] bg-[#fff4e8]',
-    muted: 'text-[#6e5547]',
-    title: 'text-[#241711]',
-    badge: 'bg-[#241711] text-[#fff1e2]',
-    action: 'bg-[#241711] text-[#fff1e2] hover:bg-[#3a241b]',
-    actionAlt: 'border border-[#dcc8b7] bg-transparent text-[#241711] hover:bg-[#f5e7d7]',
   }
 }
 
@@ -260,9 +235,7 @@ function DirectoryHome({ primaryTask, enabledTasks, listingPosts, classifiedPost
               const taskKey = resolveTaskKey(post.task, profilePosts.length ? 'profile' : 'classified')
               return (
                 <Link key={post.id} href={getTaskHref(taskKey, post.slug)} className={`overflow-hidden rounded-[1.8rem] ${tone.panel}`}>
-                  <div className="relative h-44 overflow-hidden">
-                    <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                  </div>
+                  <div className="h-3 bg-gradient-to-r from-slate-700 via-slate-600 to-slate-800" aria-hidden />
                   <div className="p-5">
                     <p className="text-[11px] font-semibold uppercase tracking-[0.24em] opacity-70">{meta.category || post.task || 'Profile'}</p>
                     <h3 className="mt-2 text-xl font-semibold">{post.title}</h3>
@@ -301,6 +274,33 @@ function getPostCategoryLabel(post: SitePost): string {
   return 'Update'
 }
 
+function estimateReadMinutes(post: SitePost): number {
+  const text = `${post.title} ${post.summary || ''}`
+  const words = text.trim().split(/\s+/).filter(Boolean).length
+  return Math.max(1, Math.min(24, Math.round(words / 200) || 1))
+}
+
+const partnerPills = ['Syndication', 'Wire partners', 'Regional desks', 'Licensing', 'Analytics', 'Newsroom API']
+
+const faqItems = [
+  {
+    q: 'What is media distribution on this site?',
+    a: 'We publish and surface article-style updates so readers can follow filings, announcements, and coverage in one place—built for scan-friendly reading and clear attribution.',
+  },
+  {
+    q: 'How often are new articles published?',
+    a: 'The homepage pulls the latest posts from the connected feed. When the feed is quiet, editorial placeholders keep the layout populated until new items arrive.',
+  },
+  {
+    q: 'Can I republish or syndicate a story?',
+    a: 'Reach out through Contact with your outlet, territory, and intended use. Editorial and legal review apply before any republication terms are confirmed.',
+  },
+  {
+    q: 'How do I submit a correction?',
+    a: 'Email the desk with the article URL, the line in question, and supporting references. We prioritize accuracy updates and post an audit note when warranted.',
+  },
+]
+
 function EditorialHome({
   primaryTask,
   posts,
@@ -310,7 +310,6 @@ function EditorialHome({
   posts: SitePost[]
   supportTasks: EnabledTask[]
 }) {
-  const tone = getEditorialTone()
   const defaultEditorialTask: TaskKey =
     primaryTask?.key === 'mediaDistribution' || primaryTask?.key === 'article'
       ? primaryTask.key
@@ -320,154 +319,359 @@ function EditorialHome({
     getTaskHref(resolveTaskKey((post as { task?: unknown }).task, defaultEditorialTask), post.slug)
 
   const lead = posts[0]
-  const spotlightPosts = posts.slice(1, 4)
-  const deckPosts = posts.slice(10, 16)
-  const featuredSecondary = posts[1]
+  const trending = posts.slice(0, 12)
+  const deskFeature = posts[1] || lead
+  const promoPost = posts[2] || posts[1] || lead
+  const deckPosts = posts.slice(3, 9)
 
   const headline = lead?.title || SITE_CONFIG.name
   const summarySource = lead?.summary || SITE_CONFIG.description
-  const [bodyA, bodyB] = splitIntoTwoParagraphs(summarySource)
+  const [, bodyB] = splitIntoTwoParagraphs(summarySource)
   const secondParagraph = bodyB || SITE_CONFIG.tagline
+  const aboutCols = splitIntoTwoParagraphs(SITE_CONFIG.description)
+
+  const publishedLabel = lead?.publishedAt
+    ? new Date(lead.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+    : new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+
+  const hoursAgo = (iso?: string | null) => {
+    if (!iso) return null
+    const h = Math.floor((Date.now() - new Date(iso).getTime()) / 3600000)
+    if (h < 1) return 'Published just now'
+    if (h < 48) return `Published ${h}h ago`
+    return null
+  }
+
+  const stats = [
+    { label: 'Stories live', value: `${Math.max(posts.length, 1)}+` },
+    { label: 'Read focus', value: lead ? `${estimateReadMinutes(lead)} min` : '5 min' },
+    { label: 'Distribution', value: 'Archive' },
+  ]
 
   return (
-    <main className="bg-[#fafafa] text-[#1a1a1a]">
-      <div className="mx-auto min-h-screen max-w-[1400px] border-x border-[#0f172a]/8 bg-white shadow-[0_0_0_1px_rgba(15,23,42,0.04)]">
-        <section className="px-5 py-12 sm:px-8 sm:py-16 lg:px-12 lg:py-20">
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-10 lg:items-start">
-            {/* Left: lead story — headings + highlighted body */}
-            <div className="order-1 max-w-xl lg:pt-2">
-              <p className="font-display text-[2.15rem] font-medium leading-[1.05] tracking-[-0.04em] sm:text-5xl">
-                {SITE_CONFIG.name}
-              </p>
-              <p className="mt-4 max-w-md text-[0.95rem] leading-relaxed text-[#444]">{SITE_CONFIG.tagline}</p>
+    <main className="text-zinc-100">
+      {/* Hero */}
+      <section className="relative min-h-[78vh] overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="h-full w-full bg-gradient-to-br from-zinc-800 via-zinc-950 to-black" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#07080d] via-[#07080d]/75 to-black/40" />
+        </div>
 
-              <p className="mt-6 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#64748b]">
-                {lead ? getPostCategoryLabel(lead) : 'Featured'}
-              </p>
-              <h1 className="font-display mt-3 text-[2.35rem] font-medium leading-[1.08] tracking-[-0.035em] text-[#111] sm:text-5xl lg:text-[2.75rem]">
-                <span className="decoration-primary/35 underline decoration-2 underline-offset-[0.18em]">{headline}</span>
-              </h1>
+        <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-4 pb-16 pt-28 sm:px-6 lg:px-8">
+          <p className="text-xs font-bold uppercase tracking-[0.35em] text-lime-300">Story of the week</p>
+          <h1 className="mt-4 max-w-4xl text-4xl font-black uppercase leading-[0.95] tracking-tight text-white sm:text-6xl lg:text-7xl">
+            {headline}
+          </h1>
+          <p className="mt-6 max-w-2xl text-sm leading-relaxed text-zinc-300 sm:text-base">
+            {lead?.summary ? excerptShort(String(lead.summary)) : SITE_CONFIG.tagline}
+          </p>
 
-              <div className="mt-8 space-y-5 rounded-r-xl border-l-4 border-primary bg-primary/6 py-4 pl-5 pr-4 text-[0.98rem] leading-[1.75] text-[#2d2d2d]">
-                {bodyA ? <p>{bodyA}</p> : null}
-                {secondParagraph ? <p className="text-[#3d3d3d]">{secondParagraph}</p> : null}
-              </div>
-
-              {featuredSecondary ? (
-                <Link
-                  href={postHref(featuredSecondary)}
-                  className="mt-10 block max-w-lg border-t border-black/10 pt-8 transition-colors hover:bg-[#f8fafc]"
-                >
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">Also this week</p>
-                  <p className="font-display mt-2 text-lg font-semibold leading-snug text-[#0f172a]">
-                    {featuredSecondary.title}
-                  </p>
-                  {featuredSecondary.summary ? (
-                    <p className="mt-3 rounded-md bg-amber-50/90 px-3 py-2 text-sm leading-relaxed text-[#422006] ring-1 ring-amber-200/80">
-                      {featuredSecondary.summary}
-                    </p>
-                  ) : null}
-                </Link>
-              ) : (
-                <div className="mt-10 border-t border-black/10 pt-8">
-                  <Link
-                    href={primaryTask?.route || '/articles'}
-                    className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold ${tone.action}`}
-                  >
-                    {primaryTask?.label || 'Browse'}
-                    <ArrowRight className="h-4 w-4" />
-                  </Link>
+          <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap gap-3">
+              <div className="flex items-center gap-3 rounded-full border border-white/15 bg-black/50 px-5 py-3 backdrop-blur-md">
+                <Clock className="h-4 w-4 text-lime-300" />
+                <div>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">Time to read</p>
+                  <p className="text-sm font-bold text-white">{lead ? `${estimateReadMinutes(lead)} min read` : '5 min read'}</p>
                 </div>
-              )}
+              </div>
+              {hoursAgo(lead?.publishedAt) ? (
+                <div className="rounded-full border border-white/15 bg-black/40 px-5 py-3 text-sm text-zinc-200 backdrop-blur-md">
+                  {hoursAgo(lead?.publishedAt)}
+                </div>
+              ) : null}
             </div>
 
-            {/* Center: spotlight stack — text-only cards */}
-            <div className="order-3 flex flex-col gap-5 lg:order-2">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#64748b]">Spotlight</p>
-              {spotlightPosts.length ? (
-                spotlightPosts.map((post, i) => (
+            <div className="flex items-center gap-3 rounded-full border border-white/15 bg-black/50 px-5 py-3 backdrop-blur-md">
+              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-lime-400 text-zinc-950">
+                <MapPin className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400">Desk &amp; date</p>
+                <p className="text-sm font-semibold text-white">{publishedLabel}</p>
+                <p className="text-xs text-zinc-400">{lead ? getPostCategoryLabel(lead) : 'Editorial'} · {SITE_CONFIG.name}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-wrap gap-3">
+            {lead ? (
+              <Link
+                href={postHref(lead)}
+                className="inline-flex items-center gap-2 rounded-full bg-lime-400 px-6 py-3 text-xs font-bold uppercase tracking-[0.14em] text-zinc-950 shadow-[0_0_28px_rgba(190,242,100,0.35)] hover:bg-lime-300"
+              >
+                Read now
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : null}
+            <Link
+              href={primaryTask?.route || '/archive'}
+              className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/5 px-6 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-white hover:bg-white/10"
+            >
+              Open archive
+            </Link>
+          </div>
+
+          <p className="mt-14 text-center text-[10px] font-semibold uppercase tracking-[0.4em] text-zinc-500">Scroll</p>
+        </div>
+      </section>
+
+      {/* Trending strip */}
+      <section className="border-y border-white/10 bg-[#0b0d14] py-12">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-lime-300">Trending</p>
+              <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">Top stories in the archive</h2>
+            </div>
+            <p className="max-w-sm text-sm text-zinc-400">Drag sideways to browse headlines, categories, and bylines—same feed, faster scan.</p>
+          </div>
+
+          <div className="relative mt-8">
+            <div className="pointer-events-none absolute right-0 top-1/2 z-10 hidden h-16 w-16 -translate-y-1/2 rounded-full border border-sky-400/60 bg-sky-500/20 text-center text-[10px] font-bold uppercase leading-tight text-sky-200 sm:flex sm:items-center sm:justify-center">
+              Drag
+            </div>
+            <div className="flex gap-4 overflow-x-auto pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {trending.length ? (
+                trending.map((post) => (
                   <Link
                     key={post.id}
                     href={postHref(post)}
-                    className="group rounded-xl border border-black/10 bg-[#fafafa] p-5 shadow-sm transition hover:border-primary/40 hover:shadow-md"
+                    className="group relative w-[min(300px,85vw)] shrink-0 snap-start rounded-3xl border border-white/10 bg-gradient-to-br from-zinc-900 to-zinc-950 p-5 shadow-[0_20px_50px_rgba(0,0,0,0.45)] transition hover:border-lime-400/40"
                   >
-                    <span className="text-[10px] font-bold tabular-nums text-primary/80">{String(i + 1).padStart(2, '0')}</span>
-                    <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                    <span className="inline-flex rounded-full bg-lime-400 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-zinc-950">
                       {getPostCategoryLabel(post)}
-                    </p>
-                    <h2 className="font-display mt-2 text-xl font-semibold leading-snug text-[#0f172a] group-hover:text-primary">
-                      {post.title}
-                    </h2>
-                    {post.summary ? (
-                      <p className="mt-3 border-l-2 border-primary/50 pl-3 text-sm leading-relaxed text-[#444]">{post.summary}</p>
-                    ) : null}
+                    </span>
+                    <p className="mt-4 text-base font-bold leading-snug text-white">{post.title}</p>
+                    <p className="mt-3 text-xs text-zinc-400">{post.authorName || 'Editorial desk'}</p>
                   </Link>
                 ))
               ) : (
-                <p className="text-sm text-[#666]">More stories will appear here.</p>
+                <p className="text-sm text-zinc-500">Connect the feed to populate trending cards.</p>
               )}
             </div>
-
           </div>
+        </div>
+      </section>
 
-          {/* Heavy grid — more dummy / real cards, content-forward */}
-          {deckPosts.length ? (
-            <div className="mt-16 border-t border-black/10 pt-14">
-              <h2 className="font-display text-2xl font-semibold tracking-[-0.02em] text-[#111] sm:text-3xl">
-                <span className="bg-[linear-gradient(transparent_65%,rgba(29,78,216,0.15)_0)]">From the desk</span>
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm text-[#555]">
-                Longer summaries stay on the home page for scan-friendly reading. When your CMS feed is connected, these rows fill automatically from published posts.
+      {/* Partners */}
+      <section className="bg-[#07080d] py-14">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <h2 className="text-xs font-bold uppercase tracking-[0.3em] text-zinc-500">Powered by</h2>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            {partnerPills.map((name) => (
+              <span
+                key={name}
+                className="rounded-full border border-white/10 bg-white/5 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-300"
+              >
+                {name}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* What we publish */}
+      <section className="border-t border-white/10 bg-[#0b0d14] py-16 text-zinc-100">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.35fr)_1fr] lg:px-8 lg:gap-16">
+          <h2 className="text-5xl font-black uppercase leading-none tracking-tight text-white sm:text-6xl">What we publish</h2>
+          <div>
+            <p className="text-2xl font-black uppercase leading-tight tracking-tight text-lime-300 sm:text-3xl">{SITE_CONFIG.tagline}</p>
+            <div className="mt-8 grid gap-8 text-sm leading-relaxed text-zinc-400 sm:grid-cols-2">
+              <p>{aboutCols[0]}</p>
+              <p>{aboutCols[1] || secondParagraph}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured story + image (breaking / desk) */}
+      {deskFeature ? (
+        <section className="border-t border-white/10 bg-[#0c0e16] py-14">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="rounded-[2rem] border border-white/10 bg-[#11131d] p-6 lg:p-10">
+              <h2 className="text-3xl font-black uppercase tracking-tight text-white sm:text-4xl">Featured story</h2>
+              <div className="mt-6 flex h-12 w-12 items-center justify-center rounded-full bg-lime-400 text-zinc-950">
+                <FileText className="h-5 w-5" />
+              </div>
+              <p className="mt-4 text-lg font-semibold text-white">
+                {new Date(deskFeature.publishedAt || Date.now()).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
               </p>
-              <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {deckPosts.map((post) => (
-                  <Link
-                    key={post.id}
-                    href={postHref(post)}
-                    className="flex h-full flex-col rounded-2xl border border-black/10 bg-white p-6 shadow-[0_8px_30px_rgba(15,23,42,0.06)] transition hover:border-primary/35 hover:shadow-[0_12px_40px_rgba(15,23,42,0.1)]"
-                  >
-                    <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-primary">
-                      {getPostCategoryLabel(post)}
-                    </span>
-                    <h3 className="font-display mt-4 text-xl font-semibold leading-snug text-[#0f172a]">{post.title}</h3>
-                    {post.summary ? (
-                      <p className="mt-4 grow rounded-lg bg-slate-50 px-3 py-3 text-sm leading-[1.65] text-[#334155] ring-1 ring-slate-200/80">
-                        {post.summary}
-                      </p>
-                    ) : null}
-                  </Link>
-                ))}
+              <p className="mt-2 text-sm text-zinc-400">{getPostCategoryLabel(deskFeature)} · {deskFeature.authorName || 'Desk'}</p>
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-zinc-400">{deskFeature.summary || SITE_CONFIG.description}</p>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  href={postHref(deskFeature)}
+                  className="inline-flex rounded-full border border-white/30 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.12em] text-white hover:bg-white/10"
+                >
+                  Open article
+                </Link>
+                <Link
+                  href={primaryTask?.route || '/archive'}
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white hover:border-lime-400/50"
+                  aria-label="Open archive"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
             </div>
-          ) : null}
+          </div>
+        </section>
+      ) : null}
 
-          {supportTasks.length ? (
-            <div className="mt-16 grid gap-4 border-t border-black/10 pt-12 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Split promo */}
+      {promoPost ? (
+        <section className="bg-[#07080d] py-14">
+          <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col justify-center rounded-[2rem] border border-white/10 bg-[#0f111a] p-8 sm:p-10">
+              <p className="text-xs font-bold uppercase tracking-[0.28em] text-lime-300">Editor&apos;s choice</p>
+              <h2 className="mt-4 text-2xl font-black uppercase leading-tight text-white sm:text-3xl">
+                Want the sharpest angles on business media and filings?
+              </h2>
+              <p className="mt-4 text-sm leading-relaxed text-zinc-400">
+                {promoPost.summary || 'Follow the desk for signal-heavy briefs—short posts, clear labels, and fast links into the full story.'}
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link
+                  href="/contact"
+                  className="rounded-full bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-[0.1em] text-zinc-950 hover:bg-zinc-200"
+                >
+                  Guest post
+                </Link>
+                <Link
+                  href={postHref(promoPost)}
+                  className="rounded-full border border-white/25 px-5 py-2.5 text-xs font-semibold uppercase tracking-[0.1em] text-white hover:bg-white/10"
+                >
+                  Read feature
+                </Link>
+                <Link
+                  href="/search"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/20 text-white hover:border-lime-400/50"
+                  aria-label="Search"
+                >
+                  <Globe2 className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* Stats + stream CTA */}
+      <section className="relative overflow-hidden border-t border-white/10 bg-[#0b0d14] py-16">
+        <div className="absolute inset-0 bg-[#07080d]" />
+        <div className="relative mx-auto flex max-w-7xl flex-col gap-10 px-4 sm:px-6 lg:flex-row lg:items-stretch lg:justify-between lg:px-8">
+          <div className="max-w-lg rounded-[2rem] border border-white/10 bg-black/50 p-8 backdrop-blur-md">
+            <p className="text-xs font-bold uppercase tracking-[0.28em] text-lime-300">Live stream</p>
+            <h2 className="mt-3 text-2xl font-black uppercase text-white sm:text-3xl">Never miss a filing or desk note.</h2>
+            <p className="mt-4 text-sm text-zinc-400">Open the article index—same routes, refreshed styling tuned for media distribution.</p>
+            <Link
+              href={primaryTask?.route || '/archive'}
+              className="mt-8 inline-flex rounded-full bg-white px-6 py-3 text-xs font-bold uppercase tracking-[0.12em] text-zinc-950 hover:bg-lime-300"
+            >
+              Browse archive
+            </Link>
+          </div>
+          <div className="flex w-full max-w-sm flex-col justify-center gap-0 rounded-[2rem] bg-lime-400 p-8 text-zinc-950 shadow-[0_0_40px_rgba(190,242,100,0.25)] lg:ml-auto">
+            {stats.map((row) => (
+              <div key={row.label} className="border-b border-zinc-900/10 py-4 first:pt-0 last:border-b-0 last:pb-0">
+                <p className="text-4xl font-black tabular-nums">{row.value}</p>
+                <p className="mt-1 text-xs font-bold uppercase tracking-[0.2em] text-zinc-800">{row.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* From the desk grid */}
+      {deckPosts.length ? (
+        <section className="bg-[#07080d] py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <h2 className="text-2xl font-black uppercase tracking-tight text-white sm:text-3xl">From the desk</h2>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-400">
+              Summaries stay on the homepage for quick scanning. Each card links through to the full article route.
+            </p>
+            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {deckPosts.map((post) => (
+                <Link
+                  key={post.id}
+                  href={postHref(post)}
+                  className="flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-[#0f111a] transition hover:border-lime-400/40"
+                >
+                  <div className="flex flex-1 flex-col p-5">
+                    <span className="w-fit rounded-full bg-lime-400/15 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-lime-300">
+                      {getPostCategoryLabel(post)}
+                    </span>
+                    <h3 className="mt-3 text-lg font-bold leading-snug text-white">{post.title}</h3>
+                    {post.summary ? <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">{post.summary}</p> : null}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {/* FAQ */}
+      <section className="border-t border-white/10 bg-white py-16 text-zinc-950">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_1.4fr] lg:px-8">
+          <div className="flex flex-col justify-between rounded-[2rem] bg-lime-400 p-8 text-zinc-950 sm:p-10">
+            <p className="text-6xl font-black uppercase leading-none sm:text-7xl">FAQ</p>
+            <div className="mt-10">
+              <p className="text-sm font-semibold">Another question for the desk?</p>
+              <Link
+                href="/contact"
+                className="mt-4 inline-flex rounded-full bg-zinc-950 px-5 py-2.5 text-xs font-bold uppercase tracking-[0.12em] text-white hover:bg-zinc-800"
+              >
+                Contact us
+              </Link>
+            </div>
+          </div>
+          <div className="divide-y divide-zinc-200">
+            {faqItems.map((item) => (
+              <details key={item.q} className="group py-4 first:pt-0">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left font-bold text-zinc-900 marker:content-none [&::-webkit-details-marker]:hidden">
+                  <span>{item.q}</span>
+                  <ChevronDown className="h-5 w-5 shrink-0 text-zinc-400 transition group-open:rotate-180" />
+                </summary>
+                <p className="mt-3 text-sm leading-relaxed text-zinc-600">{item.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {supportTasks.length ? (
+        <section className="border-t border-white/10 bg-[#0b0d14] py-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-zinc-500">More surfaces</p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {supportTasks.slice(0, 3).map((task) => (
                 <Link
                   key={task.key}
                   href={task.route}
-                  className="rounded-xl border border-black/10 bg-[#fafafa] px-5 py-4 transition hover:bg-[#f3f3f3]"
+                  className="rounded-2xl border border-white/10 bg-[#11131d] px-5 py-4 text-sm text-zinc-300 transition hover:border-lime-400/30 hover:text-white"
                 >
-                  <h3 className="font-display text-lg font-medium text-[#111]">{task.label}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[#555]">{task.description}</p>
+                  <span className="font-bold text-white">{task.label}</span>
+                  <span className="mt-1 block text-zinc-500">{task.description}</span>
                 </Link>
               ))}
             </div>
-          ) : null}
+          </div>
         </section>
-
-        <div
-          className="h-4 w-full"
-          style={{
-            background:
-              'repeating-linear-gradient(90deg, #0a0a0a 0px, #0a0a0a 3px, #fff 3px, #fff 5px, #0a0a0a 5px, #0a0a0a 8px, #fafafa 8px, #fafafa 11px)',
-          }}
-          aria-hidden
-        />
-      </div>
+      ) : null}
     </main>
   )
+}
+
+function excerptShort(text: string, max = 160) {
+  const v = text.trim()
+  if (!v) return ''
+  return v.length > max ? `${v.slice(0, max - 1).trimEnd()}…` : v
 }
 
 function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { primaryTask?: EnabledTask; imagePosts: SitePost[]; profilePosts: SitePost[]; articlePosts: SitePost[] }) {
@@ -505,9 +709,14 @@ function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { p
                 href={getTaskHref(resolveTaskKey(post.task, 'image'), post.slug)}
                 className={index === 0 ? `col-span-2 row-span-2 overflow-hidden rounded-[2.4rem] ${tone.panel}` : `overflow-hidden rounded-[1.8rem] ${tone.soft}`}
               >
-                <div className={index === 0 ? 'relative h-[360px]' : 'relative h-[170px]'}>
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
+                <div
+                  className={
+                    index === 0
+                      ? 'h-[360px] bg-gradient-to-br from-slate-800 via-slate-900 to-black'
+                      : 'h-[170px] bg-gradient-to-br from-slate-800 to-slate-950'
+                  }
+                  aria-hidden
+                />
               </Link>
             ))}
           </div>
@@ -522,9 +731,7 @@ function VisualHome({ primaryTask, imagePosts, profilePosts, articlePosts }: { p
           <div className="grid gap-4 md:grid-cols-3">
             {creators.map((post) => (
               <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
-                <div className="relative h-40 overflow-hidden rounded-[1.2rem]">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
+                <div className="h-2 rounded-full bg-gradient-to-r from-emerald-900/60 to-slate-800" aria-hidden />
                 <h3 className="mt-4 text-lg font-semibold">{post.title}</h3>
                 <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>{post.summary || 'Creator profile and visual identity surface.'}</p>
               </Link>
@@ -585,9 +792,7 @@ function CurationHome({ primaryTask, bookmarkPosts, profilePosts, articlePosts }
           <div className="grid gap-4 md:grid-cols-3">
             {people.map((post) => (
               <Link key={post.id} href={`/profile/${post.slug}`} className={`rounded-[1.8rem] p-5 ${tone.soft}`}>
-                <div className="relative h-32 overflow-hidden rounded-[1.2rem]">
-                  <ContentImage src={getPostImage(post)} alt={post.title} fill className="object-cover" />
-                </div>
+                <div className="h-2 rounded-full bg-gradient-to-r from-amber-900/50 to-stone-800" aria-hidden />
                 <h3 className="mt-4 text-lg font-semibold">{post.title}</h3>
                 <p className={`mt-2 text-sm leading-7 ${tone.muted}`}>Curator profile, saved resources, and collection notes.</p>
               </Link>
@@ -655,7 +860,7 @@ export default async function HomePage() {
   ]
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className={cn('min-h-screen', productKind === 'editorial' ? 'bg-[#07080d] text-zinc-100' : 'bg-background text-foreground')}>
       <NavbarShell />
       <SchemaJsonLd data={schemaData} />
       {productKind === 'directory' ? (

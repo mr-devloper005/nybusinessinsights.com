@@ -20,7 +20,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import {
   Select,
@@ -297,7 +297,6 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-6">
                     <div className="relative">
                       <Avatar className="w-24 h-24">
-                        <AvatarImage src={user?.avatar} />
                         <AvatarFallback className="text-2xl">
                           {user?.name?.charAt(0) || "U"}
                         </AvatarFallback>
