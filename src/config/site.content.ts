@@ -14,7 +14,7 @@ export const siteContent = {
       'A minimal article-style publishing template built for regular updates, announcements, and media distribution posts.',
     primaryCta: {
       label: 'Browse latest posts',
-      href: '/updates',
+      href: '/archive',
     },
     secondaryCta: {
       label: 'Contact us',
@@ -37,7 +37,7 @@ export const siteContent = {
         'A simple publishing template for updates, announcements, and readable article pages.',
       keywords: ['newsroom posts', 'latest updates', 'announcements', 'press articles'],
     },
-    introBadge: 'About',
+    introBadge: 'Desk',
     introTitle: 'A quiet publishing template made for regular updates.',
     introParagraphs: [
       'This template is designed for sites that publish straightforward updates and want the homepage to behave like a clean front page rather than a product landing page.',
@@ -53,7 +53,7 @@ export const siteContent = {
     ],
     primaryLink: {
       label: 'Open archive',
-      href: '/updates',
+      href: '/archive',
     },
     secondaryLink: {
       label: 'Contact desk',
@@ -71,7 +71,7 @@ export const siteContent = {
     },
     secondaryCta: {
       label: 'View archive',
-      href: '/updates',
+      href: '/archive',
     },
   },
   taskSectionHeading: 'Latest posts',
@@ -108,8 +108,8 @@ export const taskPageMetadata: Record<Exclude<TaskKey, 'comment' | 'org' | 'soci
     description: 'Open PDFs and downloadable files.',
   },
   mediaDistribution: {
-    title: 'Latest updates',
-    description: 'Read the latest published updates and announcements.',
+    title: 'Archive',
+    description: 'Browse every published guest post and desk story.',
   },
 }
 
@@ -128,7 +128,7 @@ export const taskIntroCopy: Record<
   comment: { title: 'Comments', paragraphs: ['Commentary and response posts.'], links: [{ label: 'Home', href: '/' }] },
   org: { title: 'Organizations', paragraphs: ['Organization pages and entities.'], links: [{ label: 'Home', href: '/' }] },
   mediaDistribution: {
-    title: 'Latest updates',
+    title: 'Archive',
     paragraphs: [
       'This archive is designed for straightforward publishing: regular updates, announcements, and media-style posts presented in a clean reading format.',
       'The layout stays simple so visitors can scan headlines quickly, open stories easily, and move through the archive without distraction.',

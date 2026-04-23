@@ -265,6 +265,29 @@ body[data-site-shell="editorial"] {
     linear-gradient(180deg, rgba(255, 248, 239, 0.98) 0%, rgba(255, 252, 247, 1) 42%, rgba(255, 255, 255, 1) 100%);
 }
 
+body[data-site-shell='article-home'] {
+  background-color: #07080d;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(190, 242, 100, 0.12), transparent 55%),
+    linear-gradient(180deg, #07080d 0%, #0b0d14 45%, #08090f 100%);
+  background-attachment: fixed;
+}
+
+body[data-site-shell='article-home']::before {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 65%);
+}
+
+body[data-site-shell='article-home'] h1,
+body[data-site-shell='article-home'] h2,
+body[data-site-shell='article-home'] h3,
+body[data-site-shell='article-home'] h4 {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
 body[data-site-shell="studio"] {
   background-image:
     radial-gradient(circle at top left, rgba(16, 185, 129, 0.13), transparent 22%),

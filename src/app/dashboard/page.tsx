@@ -27,7 +27,7 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   DropdownMenu,
@@ -712,7 +712,6 @@ export default function DashboardPage() {
                 {recentActivity.map((activity) => (
                   <div key={activity.id} className="flex gap-3">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={activity.avatar} alt={activity.user} />
                       <AvatarFallback>{activity.user.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">

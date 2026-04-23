@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return post ? await buildPostMetadata('mediaDistribution', post) : await buildTaskMetadata('mediaDistribution')
 }
 
-export default async function UpdateDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function ArchiveDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params
   return <TaskDetailPage task="mediaDistribution" slug={resolvedParams.slug} />
 }

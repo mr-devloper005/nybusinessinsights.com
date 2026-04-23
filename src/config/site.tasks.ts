@@ -1,14 +1,14 @@
 export const siteTaskDefinitions = [
   {
     key: 'mediaDistribution',
-    label: 'Updates',
-    route: '/updates',
-    description: 'Recent posts and newsroom updates.',
+    label: 'Archive',
+    route: '/archive',
+    description: 'Browse every published guest post and desk story.',
     contentType: 'mediaDistribution',
     enabled: true,
   },
 ] as const
 
 export const siteTaskViews = {
-  mediaDistribution: '/updates',
+  mediaDistribution: '/archive',
 } as const

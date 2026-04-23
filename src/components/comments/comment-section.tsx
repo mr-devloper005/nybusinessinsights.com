@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Heart, Reply, Flag, ChevronDown, ChevronUp, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { NoComments } from '@/components/shared/empty-states'
 import type { Comment } from '@/types'
@@ -67,7 +67,6 @@ export function CommentSection({ comments }: CommentSectionProps) {
         {isAuthenticated ? (
           <div className="flex gap-4">
             <Avatar className="h-10 w-10 ">
-              <AvatarImage src={user?.avatar} alt={user?.name} />
               <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1">
@@ -86,10 +85,12 @@ export function CommentSection({ comments }: CommentSectionProps) {
             </div>
           </div>
         ) : (
-          <div className="text-center py-6">
-            <p className="text-muted-foreground mb-4">Sign in to join the conversation</p>
-            <Button asChild>
-              <a href="/login">Sign In</a>
+          <div className="py-6 text-center">
+            <p className="mb-4 text-muted-foreground">
+              Guest posts and reader notes are handled through our editors—reach out if you have feedback or a pitch.
+            </p>
+            <Button asChild variant="secondary">
+              <a href="/contact">Contact editors</a>
             </Button>
           </div>
         )}
@@ -144,7 +145,6 @@ function CommentItem({ comment, isReply = false }: { comment: Comment; isReply?:
       className={cn('flex gap-4', isReply && 'ml-12')}
     >
       <Avatar className="h-10 w-10 ">
-        <AvatarImage src={comment.author.avatar} alt={comment.author.name} />
         <AvatarFallback>{comment.author.name.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex-1">

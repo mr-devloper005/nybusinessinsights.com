@@ -1,14 +1,13 @@
 ﻿'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, ArrowUp, Bookmark, MessageSquare, Share2, Clock, Check } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import type { Bookmark as BookmarkType } from '@/types'
 import { cn } from '@/lib/utils'
 import { formatDistanceToNow } from 'date-fns'
@@ -91,13 +90,13 @@ export function BookmarkCard({
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
       <Card className="group h-full overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
         <Link href={`/sbm/${bookmark.slug}`} className="block">
-          <div className={cn('relative overflow-hidden', compact ? 'aspect-[4/3]' : 'aspect-[16/9]')}>
-            <Image
-              src={bookmark.image}
-              alt={bookmark.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+          <div
+            className={cn(
+              'relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950',
+              compact ? 'aspect-[4/3]' : 'aspect-[16/9]',
+            )}
+            aria-hidden
+          >
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
             <div className="absolute left-3 top-3 flex items-center gap-2">
               <Badge className="bg-background/90 text-foreground">
@@ -123,7 +122,6 @@ export function BookmarkCard({
         <CardContent className={cn('p-5', compact && 'p-4')}>
           <div className="mb-3 flex items-center gap-2">
             <Avatar className={cn('h-7 w-7', compact && 'h-6 w-6')}>
-              <AvatarImage src={author.avatar} alt={author.name} />
               <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="text-sm text-muted-foreground">
