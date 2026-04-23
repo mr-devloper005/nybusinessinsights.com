@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Folder, Lock } from 'lucide-react'
@@ -21,16 +20,12 @@ export function BookmarkCollectionCard({ collection }: { collection: BookmarkCol
     <motion.div whileHover={{ y: -4 }} transition={{ duration: 0.2 }}>
       <Link href={`/sbm/collections/${collection.id}`} className="block">
         <Card className="group h-full overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
-        <div className="grid grid-cols-3 gap-1">
-          {collection.coverImages.slice(0, 3).map((image, index) => (
-            <div key={`${collection.id}-${index}`} className="relative aspect-square overflow-hidden">
-              <Image
-                src={image}
-                alt={collection.name}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105"
-              />
-            </div>
+        <div className="grid grid-cols-3 gap-1" aria-hidden>
+          {(collection.coverImages.length ? collection.coverImages : ['', '', '']).slice(0, 3).map((_, index) => (
+            <div
+              key={`${collection.id}-${index}`}
+              className="aspect-square bg-gradient-to-br from-muted to-slate-800/50"
+            />
           ))}
         </div>
         <CardContent className="p-5">

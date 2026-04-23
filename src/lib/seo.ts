@@ -14,6 +14,16 @@ export const canonicalForPath = (path = "/") =>
 
 const baseOrigin = new URL(baseUrl).origin;
 
+/** Public `/favicon.*` — referenced in metadata and chrome (navbar/footer). */
+export const siteIconMetadata: Metadata["icons"] = {
+  icon: [
+    { url: "/favicon.ico", sizes: "any" },
+    { url: "/favicon.png", type: "image/png", sizes: "64x64" },
+  ],
+  shortcut: "/favicon.ico",
+  apple: [{ url: "/favicon.png", type: "image/png", sizes: "64x64" }],
+};
+
 const normalizeCanonicalUrl = (value: string | undefined, fallbackPath: string) => {
   if (!value) return canonicalForPath(fallbackPath);
 
@@ -237,6 +247,7 @@ export async function buildSiteMetadata(): Promise<Metadata> {
     },
     description: siteDescription,
     keywords: ctx.keywords,
+    icons: siteIconMetadata,
     robots: buildRobots(ctx.robotsIndex, ctx.robotsFollow),
     authors: [{ name: SITE_CONFIG.name }],
     creator: SITE_CONFIG.name,
@@ -282,6 +293,7 @@ export async function buildPageMetadata(options: PageMetadataOptions): Promise<M
     title,
     description,
     keywords: mergeKeywords(ctx.keywords, options.keywords),
+    icons: siteIconMetadata,
     robots: buildRobots(ctx.robotsIndex, ctx.robotsFollow),
     alternates: {
       canonical,

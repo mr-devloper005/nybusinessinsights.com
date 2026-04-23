@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
@@ -18,7 +17,7 @@ import {
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import type { Article, Listing, ClassifiedAd, User } from '@/types'
 import { cn } from '@/lib/utils'
 import { loadFromStorage, saveToStorage, storageKeys } from '@/lib/local-storage'
@@ -48,16 +47,13 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
         <Card className={cn(
           'group overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20'
         )}>
-          <div className={cn(
-            'relative overflow-hidden bg-muted',
-            featured ? 'aspect-[16/9] sm:aspect-[2/1]' : 'aspect-video'
-          )}>
-            <Image
-              src={article.coverImage || '/placeholder.svg?height=720&width=1280'}
-              alt={article.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+          <div
+            className={cn(
+              'relative overflow-hidden bg-gradient-to-br from-muted to-slate-800/50',
+              featured ? 'aspect-[16/9] sm:aspect-[2/1]' : 'aspect-video',
+            )}
+            aria-hidden
+          >
             {article.isFeatured && (
               <Badge className="absolute left-3 top-3 bg-accent text-accent-foreground">
                 Featured
@@ -86,7 +82,6 @@ export function ArticleCard({ article, featured = false }: { article: Article; f
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Avatar className="h-7 w-7">
-                  <AvatarImage src={author.avatar} alt={author.name} />
                   <AvatarFallback>{author.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <span className="text-sm text-muted-foreground">{author.name}</span>
@@ -134,13 +129,7 @@ export function ListingCard({ listing }: { listing: Listing }) {
     >
       <Link href={`/listings/${listing.slug}`}>
         <Card className="group overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
-          <div className="relative aspect-[4/3] overflow-hidden">
-            <Image
-              src={listing.images[0]}
-              alt={listing.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+          <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-slate-700 to-slate-900" aria-hidden>
             {listing.isFeatured && (
               <Badge className="absolute left-3 top-3 bg-accent text-accent-foreground">
                 Featured
@@ -236,13 +225,7 @@ export function ClassifiedAdCard({ ad }: { ad: ClassifiedAd }) {
     >
       <Link href={`/classifieds/${ad.slug}`}>
         <Card className="group overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
-          <div className="relative aspect-square overflow-hidden">
-            <Image
-              src={ad.images[0]}
-              alt={ad.title}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-            />
+          <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-muted to-slate-800/60" aria-hidden>
             {ad.isFeatured && (
               <Badge className="absolute left-3 top-3 bg-accent text-accent-foreground">
                 Featured
@@ -301,7 +284,6 @@ export function ProfileCard({ user, compact = false }: { user: User; compact?: b
         <Card className="group overflow-hidden border-border bg-card transition-all hover:border-muted-foreground/20">
           <CardContent className={cn('flex items-center gap-4', compact ? 'p-3' : 'p-5')}>
             <Avatar className={cn(compact ? 'h-10 w-10' : 'h-14 w-14')}>
-              <AvatarImage src={user.avatar} alt={user.name} />
               <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">

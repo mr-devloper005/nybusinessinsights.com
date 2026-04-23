@@ -39,7 +39,7 @@ export async function TaskDetailPageOverride({ slug }: { task: TaskKey; slug: st
           </div>
           <div className="mt-12 grid gap-0 border border-neutral-200 md:grid-cols-2">
             {recent.slice(0,2).map((item, index) => (
-              <Link key={item.id} href={`/updates/${item.slug}`} className="border-neutral-200 p-6 first:border-b md:first:border-b-0 md:first:border-r">
+              <Link key={item.id} href={`/archive/${item.slug}`} className="border-neutral-200 p-6 first:border-b md:first:border-b-0 md:first:border-r">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-neutral-500">{index === 0 ? 'Previous Post' : 'Next Post'}</p>
                 <p className="mt-3 text-lg leading-8 text-neutral-700">{item.title}</p>
               </Link>
@@ -56,7 +56,7 @@ export async function TaskDetailPageOverride({ slug }: { task: TaskKey; slug: st
           <div className="border border-neutral-200 p-6">
             <div className="space-y-5">
               {recent.map((item) => (
-                <Link key={item.id} href={`/updates/${item.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
+                <Link key={item.id} href={`/archive/${item.slug}`} className="block border-b border-neutral-200 pb-5 last:border-b-0 last:pb-0">
                   <p className="text-base leading-7 text-neutral-700">{item.title}</p>
                 </Link>
               ))}

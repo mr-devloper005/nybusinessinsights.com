@@ -1,7 +1,6 @@
 ﻿'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Image from 'next/image'
 import { PageShell } from '@/components/shared/page-shell'
 import { BookmarkCard } from '@/components/sbm/bookmark-card'
 import { ArticleCard, ListingCard, ClassifiedAdCard } from '@/components/shared/cards'
@@ -478,13 +477,8 @@ export default function DashboardSavedPage() {
           </SheetHeader>
           {activeBookmark && (
             <div className="mt-6 space-y-4">
-              <div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-border bg-muted">
-                <Image
-                  src={activeBookmark.image}
-                  alt={activeBookmark.title}
-                  fill
-                  className="object-cover"
-                />
+              <div className="flex aspect-[16/9] items-center justify-center rounded-xl border border-border bg-gradient-to-br from-muted to-slate-800/40 text-xs text-muted-foreground">
+                Text preview only
               </div>
               <h3 className="text-xl font-semibold text-foreground">{activeBookmark.title}</h3>
               <p className="text-sm text-muted-foreground">{activeBookmark.description}</p>
@@ -511,13 +505,8 @@ export default function DashboardSavedPage() {
           </SheetHeader>
           {activeAd && (
             <div className="mt-6 space-y-4">
-              <div className="relative aspect-[4/3] overflow-hidden rounded-xl border border-border bg-muted">
-                <Image
-                  src={activeAd.images[0]}
-                  alt={activeAd.title}
-                  fill
-                  className="object-cover"
-                />
+              <div className="flex aspect-[4/3] items-center justify-center rounded-xl border border-border bg-gradient-to-br from-muted to-slate-800/40 text-xs text-muted-foreground">
+                Text preview only
               </div>
               <h3 className="text-xl font-semibold text-foreground">{activeAd.title}</h3>
               <p className="text-sm text-muted-foreground">{activeAd.description}</p>

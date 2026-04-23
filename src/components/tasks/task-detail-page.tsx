@@ -1,4 +1,3 @@
-import { ContentImage } from "@/components/shared/content-image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MapPin, Globe, Phone, Tag, Mail } from "lucide-react";
@@ -290,18 +289,6 @@ export async function TaskDetailPage({ task, slug }: { task: TaskKey; slug: stri
                 ) : null}
                 {articleSummary ? (
                   <p className="text-base leading-7 text-muted-foreground">{articleSummary}</p>
-                ) : null}
-                {images[0] ? (
-                  <div className="relative aspect-[16/9] w-full overflow-hidden rounded-3xl border border-border bg-muted">
-                    <ContentImage
-                      src={images[0]}
-                      alt={`${post.title} featured image`}
-                      fill
-                      className="object-cover"
-                      intrinsicWidth={1600}
-                      intrinsicHeight={900}
-                    />
-                  </div>
                 ) : null}
                 <RichContent html={articleHtml} className="leading-8 prose-p:my-6 prose-h2:my-8 prose-h3:my-6 prose-ul:my-6" />
                 <ArticleComments slug={post.slug} />

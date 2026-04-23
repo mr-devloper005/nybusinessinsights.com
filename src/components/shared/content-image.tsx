@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties, type ImgHTMLAttributes } from "react";
+import { useMemo, type CSSProperties, type HTMLAttributes } from "react";
+import { cn } from "@/lib/utils";
 
-const PLACEHOLDER = "/placeholder.svg?height=900&width=1400";
-
-type ContentImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"> & {
+type ContentImageProps = Omit<HTMLAttributes<HTMLDivElement>, "role" | "aria-label" | "aria-hidden"> & {
   src?: string;
   alt: string;
   fill?: boolean;
@@ -12,28 +11,26 @@ type ContentImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, "src" | "alt"
   priority?: boolean;
   intrinsicWidth?: number;
   intrinsicHeight?: number;
+  sizes?: string;
+  loading?: "lazy" | "eager";
+  fetchPriority?: "high" | "low" | "auto";
 };
 
+/** Visual surface only — no network images (site-wide text-first layout). */
 export function ContentImage({
-  src,
+  src: _src,
   alt,
   fill,
   className,
   style,
-  sizes,
-  loading,
-  fetchPriority,
-  priority,
-  intrinsicWidth,
-  intrinsicHeight,
-  ...props
+  priority: _priority,
+  intrinsicWidth: _intrinsicWidth,
+  intrinsicHeight: _intrinsicHeight,
+  sizes: _sizes,
+  loading: _loading,
+  fetchPriority: _fetchPriority,
+  ...rest
 }: ContentImageProps) {
-  const initialSrc = typeof src === "string" && src.trim() ? src : PLACEHOLDER;
-  const [currentSrc, setCurrentSrc] = useState(initialSrc);
-
-  const width = intrinsicWidth ?? (fill ? 1600 : 800);
-  const height = intrinsicHeight ?? (fill ? 900 : 600);
-
   const resolvedStyle = useMemo<CSSProperties>(() => {
     if (!fill) return style || {};
     return {
@@ -45,24 +42,18 @@ export function ContentImage({
     };
   }, [fill, style]);
 
+  const decorative = !alt.trim();
   return (
-    <img
-      {...props}
-      src={currentSrc}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
+    <div
+      {...rest}
+      role={decorative ? "presentation" : undefined}
+      aria-hidden={decorative ? true : undefined}
+      aria-label={decorative ? undefined : alt}
+      className={cn(
+        "pointer-events-none select-none bg-gradient-to-br from-zinc-800 via-zinc-900 to-zinc-950",
+        className,
+      )}
       style={resolvedStyle}
-      sizes={sizes}
-      loading={priority ? "eager" : loading || "lazy"}
-      decoding="async"
-      fetchPriority={priority ? "high" : fetchPriority || "auto"}
-      onError={() => {
-        if (currentSrc !== PLACEHOLDER) {
-          setCurrentSrc(PLACEHOLDER);
-        }
-      }}
     />
   );
 }

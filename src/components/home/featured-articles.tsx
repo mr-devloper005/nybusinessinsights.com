@@ -1,15 +1,20 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { mockArticles } from '@/data/mock-data'
 import { cn } from '@/lib/utils'
 
+function authorInitials(name: string) {
+  const parts = name.split(/\s+/).filter(Boolean)
+  if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+  return name.slice(0, 2).toUpperCase()
+}
+
 export function FeaturedArticles() {
-  const featured = mockArticles.filter(a => a.isFeatured)
+  const featured = mockArticles.filter((a) => a.isFeatured)
   const source = featured.length >= 5 ? featured : mockArticles
   const [hero, second, third, ...rest] = source.slice(0, 6)
 
@@ -25,12 +30,8 @@ export function FeaturedArticles() {
               <Sparkles className="h-4 w-4 text-accent" />
               Editor’s Desk
             </div>
-            <h2 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">
-              Featured Articles
-            </h2>
-            <p className="mt-2 text-muted-foreground">
-              Curated narratives, high-signal insights, and standout community work.
-            </p>
+            <h2 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">Featured Articles</h2>
+            <p className="mt-2 text-muted-foreground">Curated narratives, high-signal insights, and standout community work.</p>
           </div>
           <Button variant="outline" asChild>
             <Link href="/articles">
@@ -42,29 +43,12 @@ export function FeaturedArticles() {
 
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           {hero && (
-            <Link
-              href={`/articles/${hero.slug}`}
-              className="group relative overflow-hidden rounded-3xl border border-border bg-card"
-            >
-              <div className="relative aspect-[16/9] overflow-hidden">
-                <Image
-                  src={hero.coverImage || '/placeholder.svg?height=720&width=1280'}
-                  alt={hero.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-                <Badge className="absolute left-6 top-6 bg-background/90 text-foreground">
-                  {hero.category}
-                </Badge>
-              </div>
+            <Link href={`/articles/${hero.slug}`} className="group relative overflow-hidden rounded-3xl border border-border bg-card">
+              <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-slate-800 to-slate-950" aria-hidden />
               <div className="space-y-3 p-6">
-                <h3 className="text-2xl font-semibold text-foreground sm:text-3xl">
-                  {hero.title}
-                </h3>
-                <p className="line-clamp-2 text-sm text-muted-foreground">
-                  {hero.excerpt}
-                </p>
+                <Badge className="w-fit bg-background/90 text-foreground">{hero.category}</Badge>
+                <h3 className="text-2xl font-semibold text-foreground sm:text-3xl">{hero.title}</h3>
+                <p className="line-clamp-2 text-sm text-muted-foreground">{hero.excerpt}</p>
                 <div className="flex flex-wrap gap-2">
                   {hero.tags.slice(0, 4).map((tag) => (
                     <Badge key={tag} variant="outline" className="text-xs">
@@ -90,14 +74,8 @@ export function FeaturedArticles() {
                   <span>{hero.commentsCount.toLocaleString()} comments</span>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-muted/40 p-3">
-                  <div className="h-10 w-10 overflow-hidden rounded-full border border-border">
-                    <Image
-                      src={hero.author.avatar}
-                      alt={hero.author.name}
-                      width={40}
-                      height={40}
-                      className="h-full w-full object-cover"
-                    />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-muted text-xs font-bold text-foreground">
+                    {authorInitials(hero.author.name)}
                   </div>
                   <div className="text-xs text-muted-foreground">
                     <span className="font-medium text-foreground">{hero.author.name}</span>
@@ -108,9 +86,7 @@ export function FeaturedArticles() {
                   </div>
                 </div>
                 <div className="rounded-xl border border-border bg-background/70 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                    Key Takeaways
-                  </p>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Key Takeaways</p>
                   <div className="mt-3 grid gap-2 text-sm text-foreground">
                     <div>Design systems become living products, not static libraries.</div>
                     <div>AI assistants accelerate audits, docs, and component QA.</div>
@@ -131,24 +107,13 @@ export function FeaturedArticles() {
                 href={`/articles/${article!.slug}`}
                 className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card"
               >
-                <div className="relative aspect-[16/9] overflow-hidden">
-                  <Image
-                    src={article!.coverImage || '/placeholder.svg?height=640&width=960'}
-                    alt={article!.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-[1.05]"
-                  />
-                </div>
+                <div className="aspect-[16/9] bg-gradient-to-br from-muted to-slate-800/40" aria-hidden />
                 <div className="space-y-2 p-5">
                   <Badge variant="secondary" className="w-fit">
                     {article!.category}
                   </Badge>
-                  <h4 className="text-lg font-semibold text-foreground">
-                    {article!.title}
-                  </h4>
-                  <p className="line-clamp-2 text-sm text-muted-foreground">
-                    {article!.excerpt}
-                  </p>
+                  <h4 className="text-lg font-semibold text-foreground">{article!.title}</h4>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">{article!.excerpt}</p>
                   <div className="text-xs text-muted-foreground" suppressHydrationWarning>
                     {new Date(article!.publishedAt).toLocaleDateString('en-US', {
                       month: 'short',
@@ -168,7 +133,7 @@ export function FeaturedArticles() {
               href={`/articles/${article.slug}`}
               className={cn(
                 'group rounded-2xl border border-border bg-card p-4 transition-all hover:-translate-y-1',
-                'hover:border-muted-foreground/30'
+                'hover:border-muted-foreground/30',
               )}
             >
               <div className="flex items-center justify-between gap-3">
@@ -180,12 +145,8 @@ export function FeaturedArticles() {
                   })}
                 </span>
               </div>
-              <h4 className="mt-3 text-base font-semibold text-foreground">
-                {article.title}
-              </h4>
-              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">
-                {article.excerpt}
-              </p>
+              <h4 className="mt-3 text-base font-semibold text-foreground">{article.title}</h4>
+              <p className="mt-2 line-clamp-2 text-sm text-muted-foreground">{article.excerpt}</p>
             </Link>
           ))}
         </div>
