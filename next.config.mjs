@@ -25,6 +25,16 @@ const nextConfig = {
     return [
       { source: "/updates", destination: "/archive", permanent: true },
       { source: "/updates/:slug*", destination: "/archive/:slug*", permanent: true },
+      {
+        source: '/users',
+        destination: '/user',
+        permanent: true,
+      },
+      {
+        source: '/users/:slug*',
+        destination: '/user/:slug*',
+        permanent: true,
+      },
     ];
   },
   async headers() {
