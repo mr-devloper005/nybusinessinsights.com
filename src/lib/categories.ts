@@ -34,6 +34,9 @@ export const CATEGORY_OPTIONS: Array<{ name: string; slug: string }> = [
   { name: "Event", slug: "event" },
   { name: "Digital", slug: "digital" },
   { name: "News", slug: "news" },
+  { name: "V News Media", slug: "v-news-media" },
+  { name: "Vefogix Media Agency", slug: "vefogix-media-agency" },
+  { name: "Vefogix Media News", slug: "vefogix-media-news" },
   { name: "Industry & Manufacturing", slug: "industry-manufacturing" },
 ];
 
